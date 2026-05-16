@@ -24,8 +24,8 @@ function OAuthCallback({ setAuth }) {
 
 export default function App() {
   const [auth, setAuth] = useState({
-  accessToken: localStorage.getItem("sf_access_token") || process.env.REACT_APP_SF_ACCESS_TOKEN,
-  instanceUrl: localStorage.getItem("sf_instance_url") || process.env.REACT_APP_SF_INSTANCE_URL,
+  accessToken: localStorage.getItem("sf_access_token"),
+  instanceUrl: localStorage.getItem("sf_instance_url"),
 });
 
   return (
