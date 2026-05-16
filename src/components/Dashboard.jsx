@@ -11,9 +11,12 @@ export default function Dashboard({ auth, setAuth }) {
   const navigate = useNavigate();
 
   if (!auth?.accessToken) {
-    navigate("/");
-    return null;
-  }
+  return (
+    <div style={{ textAlign: "center", marginTop: "100px" }}>
+      <p>Loading...</p>
+    </div>
+  );
+}
 
   const fetchRules = async () => {
     setLoading(true);
