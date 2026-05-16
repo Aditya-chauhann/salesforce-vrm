@@ -11,17 +11,24 @@ export default function Dashboard({ auth, setAuth }) {
   const navigate = useNavigate();
 
   const fetchRules = async () => {
-    setLoading(true);
-    setStatus("Fetching validation rules...");
-    try {
-      const data = await getValidationRules();
-      setRules(data || []);
-      setStatus(`✅ Loaded ${data.length} validation rules`);
-    } catch (e) {
-      setStatus("❌ Error: " + e.message);
+  setLoading(true);
+  setStatus("Fetching validation rules...");
+  try {
+    const data = await getValidationRules();
+    console.log("API response:", data);
+    if (!data || !Array.isArray(data)) {
+      setStatus("❌ Error: Invalid response from server");
+      setRules([]);
+      return;
     }
-    setLoading(false);
-  };
+    setRules(data);
+    setStatus(`✅ Loaded ${data.length} validation rules`);
+  } catch (e) {
+    setStatus("❌ Error: " + e.message);
+    setRules([]);
+  }
+  setLoading(false);
+};
 
   const toggleRule = (ruleId, currentActive) => {
     setRules((prev) => prev.map((r) =>
