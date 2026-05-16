@@ -7,19 +7,36 @@ function OAuthCallback({ setAuth }) {
   const navigate = useNavigate();
   useEffect(() => {
     const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    const accessToken = params.get("access_token");
-    const instanceUrl = params.get("instance_url");
+    const search = window.location.search.substring(1);
+    console.log("Hash:", hash);
+    console.log("Search:", search);
+    
+    const hashParams = new URLSearchParams(hash);
+    const searchParams = new URLSearchParams(search);
+    
+    const accessToken = hashParams.get("access_token");
+    const instanceUrl = hashParams.get("instance_url");
+    const error = searchParams.get("error");
+    const errorDesc = searchParams.get("error_description");
+
+    if (error) {
+      console.error("OAuth error:", error, errorDesc);
+      alert(`Login failed: ${error} - ${errorDesc}`);
+      navigate("/");
+      return;
+    }
+
     if (accessToken && instanceUrl) {
       localStorage.setItem("sf_access_token", accessToken);
       localStorage.setItem("sf_instance_url", instanceUrl);
       setAuth({ accessToken, instanceUrl });
       navigate("/dashboard");
     } else {
+      console.error("No token found in URL");
       navigate("/");
     }
   }, []);
-  return <p style={{ textAlign: "center", marginTop: "100px" }}>Authenticating with Salesforce...</p>;
+  return <p style={{ textAlign: "center", marginTop: "100px" }}>Authenticating...</p>;
 }
 
 export default function App() {
