@@ -5,7 +5,7 @@ export const SF_AUTH_URL = () => {
     response_type: "token",
     client_id: process.env.REACT_APP_SF_CLIENT_ID,
     redirect_uri: process.env.REACT_APP_SF_REDIRECT_URI,
-    scope: "api refresh_token",
+    scope: "full",
   });
   return `${process.env.REACT_APP_SF_LOGIN_URL}/services/oauth2/authorize?${params}`;
 };
