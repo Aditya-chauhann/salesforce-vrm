@@ -19,7 +19,7 @@ export default function Dashboard({ auth, setAuth }) {
     setLoading(true);
     setStatus("Fetching validation rules...");
     try {
-      const data = await getValidationRules(auth.instanceUrl, auth.accessToken);
+      const data = await getValidationRules();
       setRules(data);
       setStatus(`✅ Loaded ${data.length} validation rules`);
     } catch (e) {
@@ -47,7 +47,7 @@ export default function Dashboard({ auth, setAuth }) {
     let failed = 0;
     for (const rule of rules) {
       if (rule._pending) {
-        const ok = await toggleValidationRule(auth.instanceUrl, auth.accessToken, rule.Id, rule.Active);
+        const ok = await toggleValidationRule(rule.Id, rule.Active);
         if (ok) success++;
         else failed++;
       }
