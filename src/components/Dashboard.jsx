@@ -10,20 +10,12 @@ export default function Dashboard({ auth, setAuth }) {
   const [deploying, setDeploying] = useState(false);
   const navigate = useNavigate();
 
-  if (!auth?.accessToken) {
-  return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <p>Loading...</p>
-    </div>
-  );
-}
-
   const fetchRules = async () => {
     setLoading(true);
     setStatus("Fetching validation rules...");
     try {
       const data = await getValidationRules();
-      setRules(data);
+      setRules(data || []);
       setStatus(`✅ Loaded ${data.length} validation rules`);
     } catch (e) {
       setStatus("❌ Error: " + e.message);
@@ -32,14 +24,14 @@ export default function Dashboard({ auth, setAuth }) {
   };
 
   const toggleRule = (ruleId, currentActive) => {
-    setRules(rules.map((r) =>
+    setRules((prev) => prev.map((r) =>
       r.Id === ruleId ? { ...r, Active: !currentActive, _pending: true } : r
     ));
     setStatus("⏳ Changes pending — click Deploy to save to Salesforce");
   };
 
   const toggleAll = (activate) => {
-    setRules(rules.map((r) => ({ ...r, Active: activate, _pending: true })));
+    setRules((prev) => prev.map((r) => ({ ...r, Active: activate, _pending: true })));
     setStatus("⏳ Changes pending — click Deploy to save to Salesforce");
   };
 
@@ -55,7 +47,7 @@ export default function Dashboard({ auth, setAuth }) {
         else failed++;
       }
     }
-    setRules(rules.map(({ _pending, ...r }) => r));
+    setRules((prev) => prev.map(({ _pending, ...r }) => r));
     setStatus(`✅ Deployed! ${success} updated${failed ? `, ${failed} failed` : ""}`);
     setDeploying(false);
   };
@@ -66,11 +58,18 @@ export default function Dashboard({ auth, setAuth }) {
     navigate("/");
   };
 
-  const hasPending = rules.some((r) => r._pending);
+  if (!auth?.accessToken) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "100px" }}>
+        <p>Session expired. <a href="/">Login again</a></p>
+      </div>
+    );
+  }
+
+  const hasPending = rules?.some((r) => r._pending);
 
   return (
     <div style={{ minHeight: "100vh", background: "#f4f6f9" }}>
-      {/* Header */}
       <div style={{
         background: "#0070d2", color: "#fff",
         padding: "16px 32px", display: "flex",
@@ -88,7 +87,6 @@ export default function Dashboard({ auth, setAuth }) {
       </div>
 
       <div style={{ maxWidth: "1000px", margin: "32px auto", padding: "0 16px" }}>
-        {/* Buttons */}
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "20px" }}>
           <button onClick={fetchRules} disabled={loading} style={btn("#0070d2")}>
             {loading ? "Loading..." : "📋 Get Validation Rules"}
@@ -104,7 +102,6 @@ export default function Dashboard({ auth, setAuth }) {
           </button>
         </div>
 
-        {/* Status */}
         {status && (
           <div style={{
             background: "#fff", border: "1px solid #ddd",
@@ -115,7 +112,6 @@ export default function Dashboard({ auth, setAuth }) {
           </div>
         )}
 
-        {/* Table */}
         <ValidationRuleList rules={rules} onToggle={toggleRule} />
       </div>
     </div>
